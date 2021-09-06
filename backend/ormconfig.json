@@ -8,7 +8,9 @@
     "entities": ["src/entities/*.ts"],
     "logging": true,
     "synchronize": true,
+    "migrations": ["src/database/migrations/*.ts"],
     "cli":{
-        "entitiesDir": "src/entities"
+        "entitiesDir": "src/entities",
+        "migrationsDir": "src/database/migrations"
     }
 }
