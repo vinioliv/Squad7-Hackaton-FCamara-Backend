@@ -1,5 +1,4 @@
-import { query } from "express";
-import {MigrationInterface, QueryRunner, Table} from "typeorm";
+import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
 export class CreateUsers1630955048374 implements MigrationInterface {
 
@@ -7,7 +6,7 @@ export class CreateUsers1630955048374 implements MigrationInterface {
         await queryRunner.createTable(
             new Table({
                 name: "users",
-                columns:[
+                columns: [
                     {
                         name: "id",
                         type: "int",
@@ -15,31 +14,31 @@ export class CreateUsers1630955048374 implements MigrationInterface {
                         isGenerated: true
                     },
                     {
-                        name: "nm_email",
+                        name: "email",
                         type: "varchar"
                     },
                     {
-                        name: "nm_password",
+                        name: "password",
                         type: "varchar"
                     },
                     {
-                        name: "nm_user",
+                        name: "name",
                         type: "varchar"
                     },
                     {
-                        name: "nm_working_area",
+                        name: "workingArea",
                         type: "varchar"
                     },
                     {
-                        name: "nm_contact",
+                        name: "contact",
                         type: "varchar"
                     },
                     {
-                        name: "nm_picture",
+                        name: "picture",
                         type: "varchar"
                     },
                     {
-                        name: "ic_admin",
+                        name: "admin",
                         type: "boolean",
                         default: false
                     },

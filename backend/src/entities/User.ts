@@ -4,33 +4,40 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 class User{
     
     @PrimaryGeneratedColumn()
-    id_user: number;
+    id: number;
+    
     @Column()
-    nm_email: string;
+    email: string;
 
     @Column()
-    nm_password: string;
+    password: string;
 
     @Column()
-    nm_user: string;
+    name: string;
 
     @Column()
-    nm_working_area: string;
+    workingArea: string;
 
     @Column()
-    nm_contact: string
+    contact: string
 
     @Column()
-    nm_picture: string;
+    picture: string;
 
     @Column()
-    ic_admin: boolean;
+    admin: boolean;
 
     @CreateDateColumn()
     created_at: Date;
 
     @UpdateDateColumn()
     updated_at: Date;
+
+    constructor(){
+        if(!this.picture){
+            this.picture = "default.png";
+        }
+    }
 
 }
 
