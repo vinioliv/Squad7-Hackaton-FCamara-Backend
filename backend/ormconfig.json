@@ -1,0 +1,14 @@
+{
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "Adiversaodanoit3$$",
+    "database": "bd_ProjetoFCamara",
+    "entities": ["src/entities/*.ts"],
+    "logging": true,
+    "synchronize": true,
+    "cli":{
+        "entitiesDir": "src/entities"
+    }
+}
