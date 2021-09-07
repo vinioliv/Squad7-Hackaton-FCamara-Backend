@@ -12,4 +12,15 @@ class UserRegistration{
     }
 }
 
-export {UserRegistration}
+class UserLogin{
+    async handle(request: Request, response: Response){
+        const {email, password} = request.body;
+
+        const userService = new UserService();
+        const user = await userService.login({email, password});
+
+        return response.json(user);
+    }
+}
+
+export {UserRegistration, UserLogin}
