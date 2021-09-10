@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner, Table} from "typeorm";
+import {IsNull, MigrationInterface, QueryRunner, Table} from "typeorm";
 
 export class CreateOffices1631300474679 implements MigrationInterface {
 
@@ -15,7 +15,8 @@ export class CreateOffices1631300474679 implements MigrationInterface {
                    },
                    {
                       name: "user_id",
-                      type: "int"
+                      type: "int",
+                      isNullable: true
                    },
                    {
                        name: "name",
