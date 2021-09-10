@@ -33,17 +33,7 @@ export class CreateOffices1631300474679 implements MigrationInterface {
                         name: "address",
                         type: "varchar"
                    }
-                ],
-                // foreignKeys:[
-                //     {
-                //         name: "FKUSerId",
-                //         referencedTableName: "users",
-                //         referencedColumnNames: ["id"],
-                //         columnNames: ["user_id"],
-                //         onDelete: "SET NULL",
-                //         onUpdate: "SET NULL"
-                //     }
-                // ]
+                ]            
             })
         )
     }
