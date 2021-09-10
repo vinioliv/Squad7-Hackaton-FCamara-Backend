@@ -14,11 +14,6 @@ export class CreateOffices1631300474679 implements MigrationInterface {
                         isGenerated: true
                    },
                    {
-                      name: "user_id",
-                      type: "int",
-                      isNullable: true
-                   },
-                   {
                        name: "name",
                        type: "varchar"
                    },
@@ -35,20 +30,20 @@ export class CreateOffices1631300474679 implements MigrationInterface {
                         type: "int"
                    },
                    {
-                        name: "adress",
+                        name: "address",
                         type: "varchar"
                    }
                 ],
-                foreignKeys:[
-                    {
-                        name: "FKUSerId",
-                        referencedTableName: "users",
-                        referencedColumnNames: ["id"],
-                        columnNames: ["user_id"],
-                        onDelete: "SET NULL",
-                        onUpdate: "SET NULL"
-                    }
-                ]
+                // foreignKeys:[
+                //     {
+                //         name: "FKUSerId",
+                //         referencedTableName: "users",
+                //         referencedColumnNames: ["id"],
+                //         columnNames: ["user_id"],
+                //         onDelete: "SET NULL",
+                //         onUpdate: "SET NULL"
+                //     }
+                // ]
             })
         )
     }
