@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./User";
+
 
 @Entity("offices")
 class Office {
