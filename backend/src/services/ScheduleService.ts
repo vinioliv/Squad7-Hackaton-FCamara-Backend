@@ -1,10 +1,15 @@
-import { query, response } from "express";
-import { Any, getCustomRepository } from "typeorm";
-import { User } from "../entities/User";
+
+import { getCustomRepository } from "typeorm";
 import { ScheduleRepositories } from "../repositories/ScheduleRepositories";
 
 
 interface IScheduleAvailable {
+    office_id: number;
+    schedule_date: Date;
+}
+
+interface IScheduleSave {
+    user_id: number;
     office_id: number;
     schedule_date: Date;
 }
@@ -21,7 +26,7 @@ class ScheduleService {
         const totalDaysTillEnd = totalDays - Number(dayMonthYear[0]);
 
 
-        function incrementDay(day:any, i) {
+        function incrementDay(day: any, i) {
             let teste = Number(day);
             return teste += i;
         }
@@ -72,6 +77,36 @@ class ScheduleService {
         }
         return { daysAllowed, daysNotAllowed };
     }
+
+    async saveSchedule({ user_id, office_id, schedule_date }: IScheduleSave) {
+        const scheduleRepository = getCustomRepository(ScheduleRepositories);
+
+        console.log(user_id, office_id, schedule_date);
+        const dayMonthYear = schedule_date.toString().split('/', 3);
+
+        const alreadyScheduled = await scheduleRepository.findOne({
+            where: {
+                user_id: user_id,
+                office_id: office_id,
+                schedule_date: dayMonthYear[2] + "-" + dayMonthYear[1] + "-" + dayMonthYear[0] + " 00:00:00"
+            },
+            relations: ["office", "user"]
+        })
+
+        if (alreadyScheduled) {
+            return { msg: "you have already made an appointment for this day!" }
+        }
+
+        const newSchedule = scheduleRepository.create({
+            user_id,
+            office_id,
+            schedule_date: dayMonthYear[2] + "-" + dayMonthYear[1] + "-" + dayMonthYear[0] + " 00:00:00"
+        })
+        await scheduleRepository.save(newSchedule);
+        return { msg: "The schedule was successful!" }
+
+    }
 }
+
 
 export { ScheduleService };

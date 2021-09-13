@@ -55,7 +55,7 @@ class UserService{
                 password
             })
             if(correctCredentials){
-                return "Welcome " + correctCredentials.name;
+                return correctCredentials;
             }else{
                 return "incorrect email or password";
             }
