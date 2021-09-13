@@ -41,20 +41,20 @@ class ScheduleService {
 
         const scheduleRepository = getCustomRepository(ScheduleRepositories);
 
-
         const scheduledDay = await scheduleRepository.find({
             where: {
                 office_id: office_id,
                 user_id: user_id
             }
         })
-        const onlyDate = scheduledDay.map(data => ({
-            scheduledDay: splitDate(data.schedule_date)
-        }));
 
-        console.log("onlydate 0: " + onlyDate[0].scheduledDay)
-
-
+        if (scheduledDay.length > 0) {
+            console.log("entrou");
+            console.log(scheduledDay);
+            var onlyDate = scheduledDay.map(data => ({
+                scheduledDay: splitDate(data.schedule_date)
+            }));
+        }
 
         const dayMonthYear = schedule_date.toString().split('/', 3);
 
@@ -66,10 +66,14 @@ class ScheduleService {
 
 
         var daysAllowed = [,];
-        var daysAllowedCount = 0;
-
         var daysNotAllowed = [,];
-        var daysNotAllowedCount = 0;
+
+        var countDaysAllowed = 0;
+        var countDaysNotAllowed = 0;
+        var countOnlyDate = 0;
+
+      
+       
 
         for (let i = 0; i <= totalDaysTillEnd; ++i) {
 
@@ -82,6 +86,7 @@ class ScheduleService {
             });
             if (count > 0) {
 
+
                 const diaIncrementado = incrementDay(dayMonthYear[0], i);
 
 
@@ -93,34 +98,35 @@ class ScheduleService {
                 const availablePercentage = (quantityAllowed - quantityAllocated) * 100 / quantityAllowed;
 
                 if (quantityAllowed == 0) {
-                    daysNotAllowed[daysNotAllowedCount] = {
-                        daysNotAllowed: incrementDay(dayMonthYear[0], i),
-                        percentageAllowed: 0,
-                        scheduledByUser: scheduledByUser(onlyDate[i].scheduledDay, diaIncrementado),
-
+                    daysNotAllowed[countDaysNotAllowed] = {
+                        dayNotAllowed: incrementDay(dayMonthYear[0], i),
+                        percentageAllowed: quantityAllowed ? Number(availablePercentage.toFixed(0)) : 0,
+                        scheduledByUser: scheduledDay.length > 0 && scheduledDay.length >= countOnlyDate ? scheduledByUser(onlyDate[countOnlyDate].scheduledDay, diaIncrementado) : false,
                     };
-                    daysNotAllowedCount++;
+                    countDaysNotAllowed++;
+                    countOnlyDate++;
                 } else {
-
-                    daysAllowed[daysAllowedCount] = {
-                        daysAllowed: incrementDay(dayMonthYear[0], i),
+                    console.log("countonlydate: " + countOnlyDate)
+                    daysAllowed[countDaysAllowed] = {
+                        dayAllowed: incrementDay(dayMonthYear[0], i),
                         percentageAllowed: Number(availablePercentage.toFixed(0)),
-                        scheduledByUser: scheduledByUser(onlyDate[i].scheduledDay, diaIncrementado),
+                        scheduledByUser: scheduledDay.length > 0 && scheduledDay.length >= countOnlyDate ? scheduledByUser(onlyDate[countOnlyDate].scheduledDay, diaIncrementado) : false,
                     };
-                    daysAllowedCount++;
+                    countDaysAllowed++;
+                    countOnlyDate++;
                 }
             } else {
-                daysAllowed[daysAllowedCount] = {
+                daysAllowed[countDaysAllowed] = {
                     daysAllowed: incrementDay(dayMonthYear[0], i),
-                    percentageAllowed: 100
+                    percentageAllowed: 100,
+                    scheduledByUser: false
                 };
-                daysAllowedCount++;
+                countDaysAllowed++;
+                countOnlyDate++;
             }
         }
         return { daysAllowed, daysNotAllowed };
     }
-
-
 
 
     async saveSchedule({ user_id, office_id, schedule_date }: IScheduleSave) {
@@ -146,12 +152,12 @@ class ScheduleService {
             user_id,
             office_id,
             schedule_date: dayMonthYear[2] + "-" + dayMonthYear[1] + "-" + dayMonthYear[0] + " 00:00:00"
-        })
+        });
         await scheduleRepository.save(newSchedule);
         return { msg: "The schedule was successful!" }
+
     }
 
-    
 }
 
 
