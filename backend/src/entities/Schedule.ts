@@ -9,6 +9,9 @@ class Schedule{
     id: number;
 
     @Column()
+    schedule_date:Date;
+
+    @Column()
     user_id:number;
     @JoinColumn({name: "user_id"})
     @ManyToOne( ()=> User)
@@ -20,8 +23,7 @@ class Schedule{
     @ManyToOne( () => Office)
     office: Office
 
-    @Column()
-    schedule_date:Date;
+
 }
 
 export {Schedule}

@@ -14,6 +14,11 @@ export class CreateSchedule1631308522629 implements MigrationInterface {
                     isGenerated: true
                 },
                 {
+                    name: "schedule_date",
+                    type: "Date",
+                    
+                },
+                {
                     name: "user_id",
                     type: "int",
                     isNullable: true
@@ -22,11 +27,8 @@ export class CreateSchedule1631308522629 implements MigrationInterface {
                     name: "office_id",
                     type: "int",
                     isNullable: true
-                },
-                {
-                    name: "schedule_date",
-                    type: "timestamp" 
                 }
+               
             ],
               foreignKeys:[
                     {
@@ -51,6 +53,7 @@ export class CreateSchedule1631308522629 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.dropTable("schedules");
     }
 
 }
