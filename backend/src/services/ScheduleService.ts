@@ -4,6 +4,7 @@ import { ScheduleRepositories } from "../repositories/ScheduleRepositories";
 
 
 interface IScheduleAvailable {
+    user_id: number;
     office_id: number;
     schedule_date: Date;
 }
@@ -15,21 +16,54 @@ interface IScheduleSave {
 }
 
 class ScheduleService {
-    async consultVacancies({ office_id, schedule_date }: IScheduleAvailable) {
+    async consultVacancies({ user_id, office_id, schedule_date }: IScheduleAvailable) {
+
+        //functions
+        function splitDate(scheduledDay) {
+            const day = scheduledDay.toString().split(' ', 3);
+            return day[2];
+        }
+
+        //increment 
+        function incrementDay(day: any, i) {
+            let incrementIt = Number(day);
+            return incrementIt += i;
+        }
+
+        function scheduledByUser(dayScheduled, dayMonthYear) {
+            if (dayScheduled.toString() == dayMonthYear.toString()) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
 
         const scheduleRepository = getCustomRepository(ScheduleRepositories);
 
+
+        const scheduledDay = await scheduleRepository.find({
+            where: {
+                office_id: office_id,
+                user_id: user_id
+            }
+        })
+        const onlyDate = scheduledDay.map(data => ({
+            scheduledDay: splitDate(data.schedule_date)
+        }));
+
+        console.log("onlydate 0: " + onlyDate[0].scheduledDay)
+
+
+
         const dayMonthYear = schedule_date.toString().split('/', 3);
+
 
         const dt = new Date(Date.parse(`${dayMonthYear[1]}/01/${dayMonthYear[2]}`));
         const totalDays = new Date(dt.getFullYear(), dt.getMonth() + 1, 0).getDate();
         const totalDaysTillEnd = totalDays - Number(dayMonthYear[0]);
 
 
-        function incrementDay(day: any, i) {
-            let teste = Number(day);
-            return teste += i;
-        }
 
         var daysAllowed = [,];
         var daysAllowedCount = 0;
@@ -47,6 +81,10 @@ class ScheduleService {
                 relations: ["office"]
             });
             if (count > 0) {
+
+                const diaIncrementado = incrementDay(dayMonthYear[0], i);
+
+
                 const percentageAllowed = query[0].office.percentage_allowed;
                 const quantityConsultants = query[0].office.qt_consultants;
                 const quantityAllocated = count;
@@ -57,13 +95,17 @@ class ScheduleService {
                 if (quantityAllowed == 0) {
                     daysNotAllowed[daysNotAllowedCount] = {
                         daysNotAllowed: incrementDay(dayMonthYear[0], i),
-                        percentageAllowed: 0
+                        percentageAllowed: 0,
+                        scheduledByUser: scheduledByUser(onlyDate[i].scheduledDay, diaIncrementado),
+
                     };
                     daysNotAllowedCount++;
                 } else {
+
                     daysAllowed[daysAllowedCount] = {
                         daysAllowed: incrementDay(dayMonthYear[0], i),
-                        percentageAllowed: availablePercentage
+                        percentageAllowed: Number(availablePercentage.toFixed(0)),
+                        scheduledByUser: scheduledByUser(onlyDate[i].scheduledDay, diaIncrementado),
                     };
                     daysAllowedCount++;
                 }
@@ -77,6 +119,9 @@ class ScheduleService {
         }
         return { daysAllowed, daysNotAllowed };
     }
+
+
+
 
     async saveSchedule({ user_id, office_id, schedule_date }: IScheduleSave) {
         const scheduleRepository = getCustomRepository(ScheduleRepositories);
@@ -104,8 +149,9 @@ class ScheduleService {
         })
         await scheduleRepository.save(newSchedule);
         return { msg: "The schedule was successful!" }
-
     }
+
+    
 }
 
 
