@@ -8,6 +8,7 @@ class ScheduleAvailable {
         const user_id = Number(request.headers.authorization);
 
         const scheduleService = new ScheduleService();
+
         const scheduleAvailable = await scheduleService.consultVacancies({ user_id, office_id, schedule_date });
 
         return response.json(scheduleAvailable);
@@ -32,15 +33,25 @@ class DeleteSchedule {
         const user_id = Number(request.headers.authorization);
 
         const scheduleService = new ScheduleService();
-        console.log(office_id, schedule_date);
-        const scheduleSaved = await scheduleService.deleteSchedule({ user_id, office_id, schedule_date })
+        const scheduleDeleted = await scheduleService.deleteSchedule({ user_id, office_id, schedule_date })
 
-        if(scheduleSaved.error == "Operation not permitted"){
-            return response.status(401).json(scheduleSaved);
+        if(scheduleDeleted.error == "Operation not permitted"){
+            return response.status(401).json(scheduleDeleted);
 
         }else{
-        return response.json(scheduleSaved);
+        return response.json(scheduleDeleted);
         }
     }
 }
-export { ScheduleAvailable, SaveSchedule, DeleteSchedule }
+
+class ScheduleHistory{
+    async handle(request: Request, response: Response){
+        const user_id = Number(request.headers.authorization);
+
+        const scheduleService = new ScheduleService();
+        const scheduleHistory = await scheduleService.scheduleHistory({user_id})
+
+        return response.json(scheduleHistory);
+    }
+}
+export { ScheduleAvailable, SaveSchedule, DeleteSchedule, ScheduleHistory }

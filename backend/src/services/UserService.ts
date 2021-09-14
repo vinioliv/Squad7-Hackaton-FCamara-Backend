@@ -63,6 +63,8 @@ class UserService {
             return "e-mail not registered in the application";
         }
     }
+
+    
 }
 
 export { UserService }

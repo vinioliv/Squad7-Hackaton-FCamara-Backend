@@ -9,17 +9,20 @@ interface IScheduleAvailable {
     office_id: number;
     schedule_date: Date;
 }
-
 interface IScheduleSave {
     user_id: number;
     office_id: number;
     schedule_date: Date;
 }
-interface IScheduleDelete{
-    user_id:number;
+interface IScheduleDelete {
+    user_id: number;
     office_id: number;
     schedule_date: Date;
 }
+interface IscheduleHistory {
+    user_id: number
+}
+
 
 class ScheduleService {
     async consultVacancies({ user_id, office_id, schedule_date }: IScheduleAvailable) {
@@ -58,7 +61,7 @@ class ScheduleService {
         })
 
         if (scheduledDay.length > 0) {
-            
+
             var onlyDate = scheduledDay.map(data => ({
                 scheduledDay: splitDate(data.schedule_date)
             }));
@@ -171,7 +174,7 @@ class ScheduleService {
 
     }
 
-    async deleteSchedule({user_id, office_id, schedule_date}:IScheduleDelete){
+    async deleteSchedule({ user_id, office_id, schedule_date }: IScheduleDelete) {
         const scheduleRepository = getCustomRepository(ScheduleRepositories);
 
         const dayMonthYear = schedule_date.toString().split('/', 3);
@@ -186,8 +189,8 @@ class ScheduleService {
         })
 
 
-        if(!theresSchedule){
-            return {error: "Operation not permitted"};
+        if (!theresSchedule) {
+            return { error: "Operation not permitted" };
         }
 
         const removeSchedule = scheduleRepository.create({
@@ -197,10 +200,33 @@ class ScheduleService {
         });
 
         await scheduleRepository.delete(removeSchedule);
-        return {msg: "The schedule was deleted!"}
+        return { msg: "The schedule was deleted!" }
 
 
+    }
 
+    async scheduleHistory({ user_id }: IscheduleHistory) {
+        const scheduleRepository = getCustomRepository(ScheduleRepositories);
+
+        const history = await scheduleRepository.find({
+            where: {
+                user_id: user_id
+            },
+            relations: ["office"]
+        })
+        console.log(history[0].schedule_date)
+        console.log(history[0].office.name);
+
+        if (history) {
+            let result = history.map(data => ({
+                scheduled_day: data.schedule_date,
+                office: data.office.name
+            }));
+
+            return {result};
+        } else {
+            return "No schedule found!"
+        }
 
     }
 
