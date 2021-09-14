@@ -1,4 +1,5 @@
 
+import { response } from "express";
 import { getCustomRepository } from "typeorm";
 import { ScheduleRepositories } from "../repositories/ScheduleRepositories";
 
@@ -11,6 +12,11 @@ interface IScheduleAvailable {
 
 interface IScheduleSave {
     user_id: number;
+    office_id: number;
+    schedule_date: Date;
+}
+interface IScheduleDelete{
+    user_id:number;
     office_id: number;
     schedule_date: Date;
 }
@@ -52,7 +58,7 @@ class ScheduleService {
         })
 
         if (scheduledDay.length > 0) {
-            ;
+            
             var onlyDate = scheduledDay.map(data => ({
                 scheduledDay: splitDate(data.schedule_date)
             }));
@@ -123,7 +129,7 @@ class ScheduleService {
                 }
             } else {
                 daysAllowed[countDaysAllowed] = {
-                    daysAllowed: incrementDay(dayMonthYear[0], i),
+                    dayAllowed: incrementDay(dayMonthYear[0], i),
                     percentageAllowed: 100,
                     remainingAmount: office_id == 1 ? 100 : 600,
                     scheduledByUser: false
@@ -162,6 +168,39 @@ class ScheduleService {
         });
         await scheduleRepository.save(newSchedule);
         return { msg: "The schedule was successful!" }
+
+    }
+
+    async deleteSchedule({user_id, office_id, schedule_date}:IScheduleDelete){
+        const scheduleRepository = getCustomRepository(ScheduleRepositories);
+
+        const dayMonthYear = schedule_date.toString().split('/', 3);
+
+        const theresSchedule = await scheduleRepository.findOne({
+            where: {
+                user_id: user_id,
+                office_id: office_id,
+                schedule_date: dayMonthYear[2] + "-" + dayMonthYear[1] + "-" + dayMonthYear[0] + " 00:00:00"
+            },
+            relations: ["office", "user"]
+        })
+
+
+        if(!theresSchedule){
+            return {error: "Operation not permitted"};
+        }
+
+        const removeSchedule = scheduleRepository.create({
+            user_id,
+            office_id,
+            schedule_date: dayMonthYear[2] + "-" + dayMonthYear[1] + "-" + dayMonthYear[0] + " 00:00:00"
+        });
+
+        await scheduleRepository.delete(removeSchedule);
+        return {msg: "The schedule was deleted!"}
+
+
+
 
     }
 

@@ -1,7 +1,7 @@
 import { getCustomRepository } from "typeorm";
 import { UserRespositories } from "../repositories/UserRepositories";
 
-interface IUserRequestRegister{
+interface IUserRequestRegister {
     email: string;
     password: string;
     name: string;
@@ -12,13 +12,13 @@ interface IUserRequestRegister{
 }
 
 
-interface IUserRequestLogin{
+interface IUserRequestLogin {
     email: string;
     password: string;
 }
 
-class UserService{
-    async save({email, password, name, workingArea, contact, picture, admin} : IUserRequestRegister){
+class UserService {
+    async save({ email, password, name, workingArea, contact, picture, admin }: IUserRequestRegister) {
         const userRepository = getCustomRepository(UserRespositories);
 
         const userAlreadyExists = await userRepository.findOne({
@@ -26,7 +26,7 @@ class UserService{
         })
 
         console.log(userAlreadyExists);
-        if(userAlreadyExists){
+        if (userAlreadyExists) {
             return "there is already a user with this email";
         }
 
@@ -40,29 +40,29 @@ class UserService{
             admin
         })
 
-       return await userRepository.save(newUser);
+        return await userRepository.save(newUser);
     }
 
-    async login({email, password} : IUserRequestLogin){
-        const userRepository = getCustomRepository(UserRespositories); 
+    async login({ email, password }: IUserRequestLogin) {
+        const userRepository = getCustomRepository(UserRespositories);
 
         const userExists = await userRepository.findOne({
             email
         })
-        if(userExists){
+        if (userExists) {
             const correctCredentials = await userRepository.findOne({
                 email,
                 password
             })
-            if(correctCredentials){
+            if (correctCredentials) {
                 return correctCredentials;
-            }else{
+            } else {
                 return "incorrect email or password";
             }
-        }else{
+        } else {
             return "e-mail not registered in the application";
         }
     }
 }
 
-export{UserService}
+export { UserService }
