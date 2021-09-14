@@ -16,7 +16,7 @@ const saveSchedule = new SaveSchedule();
 router.post("/register", userRegistration.handle);
 router.get("/login", userLogin.handle);
 
-router.get("/consultavailability", scheduleAvailable.handle);
+router.post("/consultavailability", scheduleAvailable.handle);
 router.post("/saveschedule", saveSchedule.handle);
 
 export {router};

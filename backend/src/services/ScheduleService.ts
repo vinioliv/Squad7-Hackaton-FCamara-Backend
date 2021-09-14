@@ -32,12 +32,15 @@ class ScheduleService {
 
         function scheduledByUser(dayScheduled, dayMonthYear) {
             if (dayScheduled.toString() == dayMonthYear.toString()) {
+                countOnlyDate++
                 return true;
+
             } else {
                 return false;
             }
 
         }
+
 
         const scheduleRepository = getCustomRepository(ScheduleRepositories);
 
@@ -49,8 +52,7 @@ class ScheduleService {
         })
 
         if (scheduledDay.length > 0) {
-            console.log("entrou");
-            console.log(scheduledDay);
+            ;
             var onlyDate = scheduledDay.map(data => ({
                 scheduledDay: splitDate(data.schedule_date)
             }));
@@ -72,8 +74,7 @@ class ScheduleService {
         var countDaysNotAllowed = 0;
         var countOnlyDate = 0;
 
-      
-       
+
 
         for (let i = 0; i <= totalDaysTillEnd; ++i) {
 
@@ -84,6 +85,7 @@ class ScheduleService {
                 },
                 relations: ["office"]
             });
+
             if (count > 0) {
 
 
@@ -94,6 +96,9 @@ class ScheduleService {
                 const quantityConsultants = query[0].office.qt_consultants;
                 const quantityAllocated = count;
 
+
+                const remainingAmount = quantityConsultants - quantityAllocated;
+
                 const quantityAllowed = ((quantityConsultants * percentageAllowed) / 100) - quantityAllocated;
                 const availablePercentage = (quantityAllowed - quantityAllocated) * 100 / quantityAllowed;
 
@@ -101,28 +106,30 @@ class ScheduleService {
                     daysNotAllowed[countDaysNotAllowed] = {
                         dayNotAllowed: incrementDay(dayMonthYear[0], i),
                         percentageAllowed: quantityAllowed ? Number(availablePercentage.toFixed(0)) : 0,
+                        remainingAmount: remainingAmount,
                         scheduledByUser: scheduledDay.length > 0 && scheduledDay.length >= countOnlyDate ? scheduledByUser(onlyDate[countOnlyDate].scheduledDay, diaIncrementado) : false,
                     };
                     countDaysNotAllowed++;
                     countOnlyDate++;
                 } else {
-                    console.log("countonlydate: " + countOnlyDate)
                     daysAllowed[countDaysAllowed] = {
                         dayAllowed: incrementDay(dayMonthYear[0], i),
                         percentageAllowed: Number(availablePercentage.toFixed(0)),
+                        remainingAmount: remainingAmount,
                         scheduledByUser: scheduledDay.length > 0 && scheduledDay.length >= countOnlyDate ? scheduledByUser(onlyDate[countOnlyDate].scheduledDay, diaIncrementado) : false,
                     };
                     countDaysAllowed++;
-                    countOnlyDate++;
+                    // countOnlyDate++;
                 }
             } else {
                 daysAllowed[countDaysAllowed] = {
                     daysAllowed: incrementDay(dayMonthYear[0], i),
                     percentageAllowed: 100,
+                    remainingAmount: office_id == 1 ? 100 : 600,
                     scheduledByUser: false
                 };
                 countDaysAllowed++;
-                countOnlyDate++;
+                // countOnlyDate++;
             }
         }
         return { daysAllowed, daysNotAllowed };
