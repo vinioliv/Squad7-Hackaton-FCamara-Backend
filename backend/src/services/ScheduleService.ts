@@ -103,19 +103,22 @@ class ScheduleService {
 
                 const percentageAllowed = query[0].office.percentage_allowed;
                 const quantityConsultants = query[0].office.qt_consultants;
+                console.log("quantidade de consultores: " + quantityConsultants)
                 const quantityAllocated = count;
+                console.log("quantidade alocada " + quantityAllocated)
 
 
-                const remainingAmount = quantityConsultants - quantityAllocated;
+
+   
 
                 const quantityAllowed = ((quantityConsultants * percentageAllowed) / 100) - quantityAllocated;
-                const availablePercentage = (quantityAllowed - quantityAllocated) * 100 / quantityAllowed;
+                const availablePercentage = (quantityAllowed * 100) / percentageAllowed;
 
                 if (quantityAllowed == 0) {
                     daysNotAllowed[countDaysNotAllowed] = {
                         dayNotAllowed: incrementDay(dayMonthYear[0], i),
-                        percentageAllowed: quantityAllowed ? Number(availablePercentage.toFixed(0)) : 0,
-                        remainingAmount: remainingAmount,
+                        percentageAllowed: quantityAllowed ? Number(availablePercentage.toFixed(1)) : 0,
+                        remainingAmount: quantityAllowed,
                         scheduledByUser: scheduledDay.length > 0 && scheduledDay.length >= countOnlyDate ? scheduledByUser(onlyDate[countOnlyDate].scheduledDay, diaIncrementado) : false,
                     };
                     countDaysNotAllowed++;
@@ -123,8 +126,8 @@ class ScheduleService {
                 } else {
                     daysAllowed[countDaysAllowed] = {
                         dayAllowed: incrementDay(dayMonthYear[0], i),
-                        percentageAllowed: Number(availablePercentage.toFixed(0)),
-                        remainingAmount: remainingAmount,
+                        percentageAllowed: Number(availablePercentage.toFixed(1)),
+                        remainingAmount: quantityAllowed,
                         scheduledByUser: scheduledDay.length > 0 && scheduledDay.length >= countOnlyDate ? scheduledByUser(onlyDate[countOnlyDate].scheduledDay, diaIncrementado) : false,
                     };
                     countDaysAllowed++;
