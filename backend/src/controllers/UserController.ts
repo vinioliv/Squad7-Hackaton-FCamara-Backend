@@ -8,7 +8,12 @@ class UserRegistration{
         const userService = new UserService();
         const user = await userService.save({email, password, name, workingArea, contact, picture, admin});
 
-        return response.json(user);
+        if(user == "there is already a user with this email"){
+            return response.status(422).json(user);
+        }else{
+            return response.status(200).json({msg: "User created!", user});
+        }
+
     }
 }
 
