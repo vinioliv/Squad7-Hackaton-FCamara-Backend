@@ -82,11 +82,11 @@ class ScheduleService {
             }));
         }
 
-
+        if(scheduledMap){
         var onlyDate = scheduledMap.sort(function (a, b) {
             return a.scheduledDay < b.scheduledDay ? -1 : a.scheduledDay > b.scheduledDay ? 1 : 0;
         })
-
+    }
 
         const dayMonthYear = schedule_date.toString().split('/', 3);
 
