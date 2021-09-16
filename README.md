@@ -48,7 +48,7 @@ yarn dev
 ```
 ## Tecnologias Utilizadas
 
-**Front-end: React.js**
+
 
 **Back-end: TypeScript**
 
