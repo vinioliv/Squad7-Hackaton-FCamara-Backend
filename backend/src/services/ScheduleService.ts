@@ -1,6 +1,6 @@
 
-import { response } from "express";
 import { getCustomRepository } from "typeorm";
+import { OfficeRepositories } from "../repositories/OfficeRepositories";
 import { ScheduleRepositories } from "../repositories/ScheduleRepositories";
 
 
@@ -50,6 +50,20 @@ class ScheduleService {
 
         }
 
+        //função necessária caso não haja nenhum agendamento ainda
+        async function howManyAllowed(office_id) {
+            const officeRepository = getCustomRepository(OfficeRepositories)
+            const data = await officeRepository.findOne({
+                where: {
+                    id: office_id
+                }
+            });
+
+            const howMany = (data.qt_consultants * data.percentage_allowed) / 100;
+            return howMany;
+
+        }
+
 
         const scheduleRepository = getCustomRepository(ScheduleRepositories);
 
@@ -60,12 +74,19 @@ class ScheduleService {
             }
         })
 
+
         if (scheduledDay.length > 0) {
 
-            var onlyDate = scheduledDay.map(data => ({
+            var scheduledMap = scheduledDay.map(data => ({
                 scheduledDay: splitDate(data.schedule_date)
             }));
         }
+
+
+        var onlyDate = scheduledMap.sort(function (a, b) {
+            return a.scheduledDay < b.scheduledDay ? -1 : a.scheduledDay > b.scheduledDay ? 1 : 0;
+        })
+
 
         const dayMonthYear = schedule_date.toString().split('/', 3);
 
@@ -76,8 +97,8 @@ class ScheduleService {
 
 
 
-        var daysAllowed = [,];
-        var daysNotAllowed = [,];
+        var daysAllowed = [];
+        var daysNotAllowed = [];
 
         var countDaysAllowed = 0;
         var countDaysNotAllowed = 0;
@@ -103,26 +124,26 @@ class ScheduleService {
 
                 const percentageAllowed = query[0].office.percentage_allowed;
                 const quantityConsultants = query[0].office.qt_consultants;
-                console.log("quantidade de consultores: " + quantityConsultants)
                 const quantityAllocated = count;
-                console.log("quantidade alocada " + quantityAllocated)
-
-
-
-   
-
                 const quantityAllowed = ((quantityConsultants * percentageAllowed) / 100) - quantityAllocated;
                 const availablePercentage = (quantityAllowed * 100) / percentageAllowed;
 
+
+                var marked;
                 if (quantityAllowed == 0) {
+                    if (onlyDate[countOnlyDate].scheduledDay == diaIncrementado) {
+                        marked = true;
+                        countOnlyDate++;
+                    } else {
+                        marked = false;
+                    }
                     daysNotAllowed[countDaysNotAllowed] = {
                         dayNotAllowed: incrementDay(dayMonthYear[0], i),
                         percentageAllowed: quantityAllowed ? Number(availablePercentage.toFixed(1)) : 0,
                         remainingAmount: quantityAllowed,
-                        scheduledByUser: scheduledDay.length > 0 && scheduledDay.length >= countOnlyDate ? scheduledByUser(onlyDate[countOnlyDate].scheduledDay, diaIncrementado) : false,
+                        scheduledByUser: marked == true ? true : false
                     };
                     countDaysNotAllowed++;
-                    countOnlyDate++;
                 } else {
                     daysAllowed[countDaysAllowed] = {
                         dayAllowed: incrementDay(dayMonthYear[0], i),
@@ -131,21 +152,20 @@ class ScheduleService {
                         scheduledByUser: scheduledDay.length > 0 && scheduledDay.length >= countOnlyDate ? scheduledByUser(onlyDate[countOnlyDate].scheduledDay, diaIncrementado) : false,
                     };
                     countDaysAllowed++;
-                    // countOnlyDate++;
                 }
             } else {
                 daysAllowed[countDaysAllowed] = {
                     dayAllowed: incrementDay(dayMonthYear[0], i),
                     percentageAllowed: 100,
-                    remainingAmount: office_id == 1 ? 100 : 600,
+                    remainingAmount: await howManyAllowed(office_id),
                     scheduledByUser: false
                 };
                 countDaysAllowed++;
-                // countOnlyDate++;
             }
         }
         return { daysAllowed, daysNotAllowed };
     }
+
 
 
     async saveSchedule({ user_id, office_id, schedule_date }: IScheduleSave) {
@@ -226,7 +246,7 @@ class ScheduleService {
                 office: data.office.name
             }));
 
-            return {result};
+            return { result };
         } else {
             return "No schedule found!"
         }
