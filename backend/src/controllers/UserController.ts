@@ -4,14 +4,16 @@ import { UserService } from "../services/UserService";
 class UserRegistration{
     async handle(request: Request, response: Response){
         const {email, password, name, workingArea, contact, picture, admin} = request.body;
-        
+
+
+
         const userService = new UserService();
         const user = await userService.save({email, password, name, workingArea, contact, picture, admin});
 
         if(user == "there is already a user with this email"){
             return response.status(422).json(user);
         }else{
-            return response.status(200).json({msg: "User created!", user});
+            return response.status(200).json(user);
         }
 
     }
