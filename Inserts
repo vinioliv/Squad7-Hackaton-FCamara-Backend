@@ -1,0 +1,6 @@
+
+insert into offices (name, local, qt_consultants, percentage_allowed, address) 
+values('Fcamara Santos', 'Santos', 100, 40, 'Prç. dos Expedicionários, 19 - Gonzaga, Santos - SP, 11065-500');
+
+insert into offices (name, local, qt_consultants, percentage_allowed, address) 
+values('Fcamara São Paulo', 'São Paulo', 600, 40, '2° andar - Consolação, São Paulo - SP, 01415-906');
