@@ -126,7 +126,8 @@ class ScheduleService {
                 const quantityConsultants = query[0].office.qt_consultants;
                 const quantityAllocated = count;
                 const quantityAllowed = ((quantityConsultants * percentageAllowed) / 100) - quantityAllocated;
-                const availablePercentage = (quantityAllowed * 100) / percentageAllowed;
+                const availablePercentage = (quantityAllowed * 100) / ((quantityConsultants * percentageAllowed) / 100);
+
 
 
                 var marked;
@@ -145,6 +146,7 @@ class ScheduleService {
                     };
                     countDaysNotAllowed++;
                 } else {
+                
                     daysAllowed[countDaysAllowed] = {
                         dayAllowed: incrementDay(dayMonthYear[0], i),
                         percentageAllowed: Number(availablePercentage.toFixed(1)),
